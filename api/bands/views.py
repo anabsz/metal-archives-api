@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Band
+from .serializers import BandSerializer
 
-# Create your views here.
+class BandViewSet(viewsets.ModelViewSet):
+    queryset = Band.objects.all()
+    serializer_class = BandSerializer

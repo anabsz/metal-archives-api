@@ -16,7 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from bands.views import BandViewSet
+
+router = DefaultRouter()
+router.register(r'bands', BandViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("api/", include(router.urls))
 ]

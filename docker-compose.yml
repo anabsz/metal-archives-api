@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  catalog-service:
+    build: ./api/bands
+    container_name: catalog-service
+    ports:
+      - "8040:8040"
+    networks:
+      - metal-network
+
+  news-service:
+    build: ./news
+    container_name: news-service
+    ports:
+      - "8080:8080"
+    networks:
+      - metal-network
+
+  gateway:
+    build: ./gateway
+    container_name: gateway-service
+    ports:
+      - "8000:8000"
+    environment:
+      - CATALOG_SERVICE_URL=http://catalog-service:8040/api/bands
+      - NEWS_SERVICE_URL=http://news-service:8080/api/news
+    depends_on:
+      - catalog-service
+      - news-service
+    networks:
+      - metal-network
+
+networks:
+  metal-network:
+    driver: bridge

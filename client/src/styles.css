@@ -71,6 +71,10 @@ input:focus { border-color: var(--blood-hi); outline: none; box-shadow: 0 0 0 1p
 .btn:disabled { opacity: .55; cursor: wait; }
 :focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
 
+.btn-sm{
+    font: 700 .75rem var(--heading);
+      padding: 5px 10px;
+}
 /* Mensagens */
 .error { color: #e0675a; margin: 0 0 12px; }
 .ok { color: #c9a24a; margin: 0 0 12px; }

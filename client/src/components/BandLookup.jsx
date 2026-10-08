@@ -19,9 +19,12 @@ export default function BandLookup() {
     setError("");
     try {
       const list = await getBands(search);
-      setBands(list);
+      console.log(list)
+      setBands(Array.isArray(list) ? list : []);
+      console.log(bands)
     } catch (err) {
       setError(err.message || "Erro ao carregar a lista de bandas.");
+      setBands([]);
     } finally {
       setBusy(false);
     }
@@ -70,6 +73,12 @@ export default function BandLookup() {
         <h3>Catálogo de Bandas ({bands.length})</h3>
         {bands.length === 0 && !busy && <p>Nenhuma banda encontrada.</p>}
 
+        {selectedBandData && (
+          <div style={{ marginTop: "2rem" }}>
+            <BandCard data={selectedBandData} />
+          </div>
+        )}
+
         <ul style={{ listStyle: "none", padding: 0 }}>
           {bands.map((band) => (
             <li
@@ -86,23 +95,16 @@ export default function BandLookup() {
                 <strong>{band.name}</strong> — {band.genre} ({band.country})
               </span>
               <button
-                className="btn-sm"
+                className="btn btn-sm"
                 onClick={() => handleSelectBand(band.id)}
                 disabled={busy}
               >
-                Ver Detalhes e Notícias
+                Ver Detalhes
               </button>
             </li>
           ))}
         </ul>
       </div>
-
-      {/* Exibe o componente BandCard quando uma banda for selecionada */}
-      {selectedBandData && (
-        <div style={{ marginTop: "2rem" }}>
-          <BandCard data={selectedBandData} />
-        </div>
-      )}
     </section>
   );
 }

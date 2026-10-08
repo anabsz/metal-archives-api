@@ -58,6 +58,7 @@ async function request(path, options = {}, retry = true) {
 }
 
 export const getBand = (id) => request(`/bands/${id}`);
+export const getBands = (search = "") => request(`/bands${search ? `?search=${encodeURIComponent(search)}` : ""}`);
 export const createBand = (data) =>
   request("/bands/", { method: "POST", body: JSON.stringify(data) });
 export const listNews = (search = "") =>

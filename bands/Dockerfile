@@ -9,6 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8080
+RUN python manage.py migrate
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+EXPOSE 8040
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8040"]

@@ -7,15 +7,42 @@ from ninja_jwt.authentication import JWTAuth
 from ninja_jwt.routers.obtain import obtain_pair_router
 
 from typing import List, Optional
-from .schemas import BandInputSchema, BandResponseSchema, NewsResponseSchema
+from .schemas import BandInputSchema, BandResponseSchema, NewsResponseSchema, BandItemSchema
 
 api = NinjaAPI(title="Metal Archives API Gateway", description="Gateway com HATEOAS")
 
 api.add_router("/auth", obtain_pair_router)
 
-API_BANDS = os.getenv("CATALOG_SERVICE_URL", "http://localhost:8040/api/bands")
+API_BANDS = os.getenv("CATALOG_SERVICE_URL", "http://localhost:8040/api/bands/")
 API_NEWS = os.getenv("NEWS_SERVICE_URL", "http://localhost:8080/api/news")
 
+@api.get("/bands", response=List[BandItemSchema], auth=JWTAuth(), tags=["Catálogo de Bandas"])
+async def list_bands(request, search: Optional[str]= None):
+    """
+    Lista todas as bandas registradas no Catálogo.
+    Suporta busca por nome via parâmetro ?search=
+    Enriquece cada registro com links HATEOAS.
+    """
+    print(search)
+    params = {"search": search} if search else {}
+    print(params)
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(f"{API_BANDS}/", params=params)
+            if response.status_code != 200:
+                return []
+            bands = response.json()
+        except httpx.RequestError:
+            return []
+
+    for band in bands:
+        band["_links"] = {
+            "self": f"/api/bands/{band['id']}",
+            "news": f"/api/news?search={band['name']}"
+        }
+
+    return bands
 @api.get("/bands/{band_id}", response=BandResponseSchema, auth=JWTAuth())
 async def get_band_details(request, band_id: int):
     async with httpx.AsyncClient() as client:

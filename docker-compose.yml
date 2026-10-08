@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   catalog-service:
-    build: ./api/bands
+    build: ./bands
     container_name: catalog-service
     ports:
       - "8040:8040"

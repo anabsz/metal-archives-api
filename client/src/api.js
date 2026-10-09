@@ -6,6 +6,7 @@ const setTokens = (t) => localStorage.setItem(KEY, JSON.stringify(t));
 export const logout = () => localStorage.removeItem(KEY);
 
 async function parse(res) {
+  if (res.status === 204) return null;
   const body = await res.json().catch(() => null);
   if (!res.ok) {
     const err = new Error(body?.erro || body?.detail || `Erro ${res.status}`);
@@ -15,7 +16,6 @@ async function parse(res) {
   return body;
 }
 
-// Rotas do ninja_jwt (obtain_pair_router montado em /auth): /auth/pair e /auth/refresh
 export async function login(username, password) {
   const res = await fetch(`${BASE}/auth/pair`, {
     method: "POST",
@@ -36,14 +36,25 @@ async function refresh() {
   setTokens({ ...t, ...(await parse(res)) });
 }
 
-async function request(path, options = {}, retry = true) {
-  const res = await fetch(`${BASE}${path}`, {
+async function request(pathOrUrl, options = {}, retry = true) {
+  let url = pathOrUrl;
+
+  if (!pathOrUrl.startsWith("http")) {
+    const cleanPath = pathOrUrl.startsWith("/api")
+      ? pathOrUrl.replace(/^\/api/, "")
+      : pathOrUrl;
+    url = `${BASE}${cleanPath.startsWith("/") ? "" : "/"}${cleanPath}`;
+  }
+
+  const res = await fetch(url, {
     ...options,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${getTokens()?.access}`,
+      ...options.headers,
     },
   });
+
   if (res.status === 401 && retry) {
     try {
       await refresh();
@@ -52,14 +63,29 @@ async function request(path, options = {}, retry = true) {
       window.dispatchEvent(new Event("ma:logout"));
       throw new Error("Sessão expirada. Entre novamente.");
     }
-    return request(path, options, false);
+    return request(pathOrUrl, options, false);
   }
   return parse(res);
 }
 
+// Navegaçao generica
+export const requestByLink = (linkUrl, options = {}) => request(linkUrl, options);
+
+// Bandas
+export const getBands = (search = "") =>
+  request(`/bands${search ? `?search=${search}` : ""}`);
+
 export const getBand = (id) => request(`/bands/${id}`);
-export const getBands = (search = "") => request(`/bands${search ? `?search=${encodeURIComponent(search)}` : ""}`);
+
 export const createBand = (data) =>
-  request("/bands/", { method: "POST", body: JSON.stringify(data) });
+  request("/bands", { method: "POST", body: JSON.stringify(data) });
+
+// Noticias
 export const listNews = (search = "") =>
-  request(`/news${search ? `?search=${encodeURIComponent(search)}` : ""}`);
+  request(`/news${search ? `?search=${search}` : ""}`);
+
+export const createNews = (newsData) =>
+  request("/news", { method: "POST", body: JSON.stringify(newsData) });
+
+export const deleteNews = (newsId) =>
+  request(`/news/${newsId}`, { method: "DELETE" });

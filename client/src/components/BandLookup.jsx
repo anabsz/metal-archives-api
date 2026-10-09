@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getBands, getBand } from "../api.js";
+import { getBands, requestByLink } from "../api.js";
 import BandCard from "./BandCard.jsx";
 
 export default function BandLookup() {
@@ -9,7 +9,6 @@ export default function BandLookup() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Carrega todas as bandas ao montar a tela
   useEffect(() => {
     fetchBands();
   }, []);
@@ -19,9 +18,7 @@ export default function BandLookup() {
     setError("");
     try {
       const list = await getBands(search);
-      console.log(list)
       setBands(Array.isArray(list) ? list : []);
-      console.log(bands)
     } catch (err) {
       setError(err.message || "Erro ao carregar a lista de bandas.");
       setBands([]);
@@ -32,16 +29,16 @@ export default function BandLookup() {
 
   function handleSearch(e) {
     e.preventDefault();
-    setSelectedBandData(null); // Reseta a banda selecionada ao pesquisar
+    setSelectedBandData(null);
     fetchBands(nameQuery);
   }
 
-  async function handleSelectBand(bandId) {
+  async function handleSelectBand(band) {
     setBusy(true);
     setError("");
     try {
-      // Busca detalhes da banda + notícias no Gateway
-      const data = await getBand(bandId);
+      const href = band._links?.self;
+      const data = await requestByLink(href);
       setSelectedBandData(data);
     } catch (err) {
       setError(err.status === 404 ? "Banda não encontrada." : err.message);
@@ -52,7 +49,6 @@ export default function BandLookup() {
 
   return (
     <section>
-      {/* Formulário de Pesquisa por Nome */}
       <form onSubmit={handleSearch} className="row">
         <input
           type="text"
@@ -68,16 +64,15 @@ export default function BandLookup() {
 
       {error && <p className="error">{error}</p>}
 
-      {/* Lista de Bandas Carregadas */}
-      <div className="band-list" style={{ marginTop: "1.5rem" }}>
-        <h3>Catálogo de Bandas ({bands.length})</h3>
-        {bands.length === 0 && !busy && <p>Nenhuma banda encontrada.</p>}
+      {selectedBandData && (
+        <div style={{ marginTop: "2rem" }}>
+          <BandCard data={selectedBandData} />
+        </div>
+      )}
 
-        {selectedBandData && (
-          <div style={{ marginTop: "2rem" }}>
-            <BandCard data={selectedBandData} />
-          </div>
-        )}
+      <div className="band-list" style={{ marginTop: "1.5rem" }}>
+        <h3>Catálogo de Bandas</h3>
+        {bands.length === 0 && !busy && <p>Nenhuma banda encontrada.</p>}
 
         <ul style={{ listStyle: "none", padding: 0 }}>
           {bands.map((band) => (
@@ -88,7 +83,7 @@ export default function BandLookup() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "0.5rem 0",
-                borderBottom: "1px solid #444"
+                borderBottom: "1px solid #444",
               }}
             >
               <span>
@@ -96,7 +91,7 @@ export default function BandLookup() {
               </span>
               <button
                 className="btn btn-sm"
-                onClick={() => handleSelectBand(band.id)}
+                onClick={() => handleSelectBand(band)}
                 disabled={busy}
               >
                 Ver Detalhes

@@ -32,7 +32,7 @@ export default function BandForm() {
       <label>Gênero<input required value={form.genre} onChange={set("genre")} placeholder="Ex.: Thrash Metal" /></label>
       <label>País<input required value={form.country} onChange={set("country")} /></label>
       {error && <p className="error">{error}</p>}
-      {created && <p className="ok">Banda cadastrada com ID {created.id}.</p>}
+      {created && <p className="ok">Banda {created.name} cadastrada.</p>}
       <button className="btn" disabled={busy}>{busy ? "Salvando…" : "Cadastrar banda"}</button>
     </form>
   );

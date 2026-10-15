@@ -3,12 +3,14 @@ import { getTokens, logout } from "./api.js";
 import Login from "./components/Login.jsx";
 import BandLookup from "./components/BandLookup.jsx";
 import NewsSearch from "./components/NewsSearch.jsx";
-import BandForm from "./components/BandForm.jsx";
+import BandManager from "./components/BandManager.jsx";
+import NewsManager from "./components/NewsManager.jsx";
 
 const TABS = [
   ["bands", "Buscar banda", BandLookup],
   ["news", "Notícias", NewsSearch],
-  ["new", "Cadastrar banda", BandForm],
+  ["managerBands", "Gerenciar Bandas", BandManager],
+  ["managerNews", "Gerenciar Noticias", NewsManager]
 ];
 
 export default function App() {

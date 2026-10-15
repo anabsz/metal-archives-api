@@ -78,7 +78,13 @@ export const getBands = (search = "") =>
 export const getBand = (id) => request(`/bands/${id}`);
 
 export const createBand = (data) =>
-  request("/bands", { method: "POST", body: JSON.stringify(data) });
+  request("/bands", {method: "POST", body: JSON.stringify(data)});
+
+export const updateBand = (data) =>
+  request("/bands", {method: "PUT", body: JSON.stringify(data)});
+
+export const deleteBand = (data) =>
+  request("/bands", {method: "DELETE", body: JSON.stringify(data)})
 
 // Noticias
 export const listNews = (search = "") =>
@@ -86,6 +92,9 @@ export const listNews = (search = "") =>
 
 export const createNews = (newsData) =>
   request("/news", { method: "POST", body: JSON.stringify(newsData) });
+
+export const updateNews = (newsData) =>
+  request("/news", { method: "PUT", body: JSON.stringify(newsData) });
 
 export const deleteNews = (newsId) =>
   request(`/news/${newsId}`, { method: "DELETE" });

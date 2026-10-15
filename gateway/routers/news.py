@@ -60,7 +60,7 @@ async def update_news(request, news_id: int, payload: NewsSchemaSubmit):
         except httpx.RequestError:
             raise HttpError(503, "Serviço de Notícias (Spring) indisponível.")
 
-@router.delete("/{news_id}", auth=JWTAuth())
+@router.delete("/{news_id}", response={204: None}, auth=JWTAuth())
 async def delete_news(request, news_id: int):
     async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
         try:

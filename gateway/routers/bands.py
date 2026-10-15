@@ -72,3 +72,27 @@ async def create(request, payload: BandSchemaSubmit):
             raise HttpError(response.status_code, response.textj)
         except httpx.RequestError:
             return HttpError(503, "Serviço de Catálogo indisponível no momento.")
+        
+@router.put("/{band_id}", response=BandSchema, auth=JWTAuth())
+async def update_band(request, band_id: int, payload: BandSchemaSubmit):
+    async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
+        try:
+            res = await client.put(f"{CATALOG_SERVICE_URL}/{band_id}/", json=payload.dict())
+            if res.status_code == 200:
+                data = res.json()
+                data["_links"] = {"self": f"/api/bands/{data.get('id')}", "all_bands": "/api/bands"}
+                return data
+            raise HttpError(res.status_code, res.text)
+        except httpx.RequestError:
+            return HttpError(503, "Serviço de Catálogo indisponível no momento.")
+
+@router.delete("/{band_id}", response={204: None}, auth=JWTAuth())
+async def delete_band(request, band_id: int):
+    async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
+        try:
+            res = await client.delete(f"{CATALOG_SERVICE_URL}/{band_id}/")
+            if res.status_code in [200, 204]:
+                return 204, None
+            raise HttpError(res.status_code, "Não foi possível excluir a banda.")
+        except httpx.RequestError:
+            return HttpError(503, "Serviço de Catálogo indisponível no momento.")

@@ -69,7 +69,7 @@ export default function BandManager() {
     setIsModalDetailOpen(true);
     setBusy(true);
     try {
-      const href = band._links?.self || `/bands/${band.id}`;
+      const href = band.links?.self;
       const data = await requestByLink(href);
       setSelectedBandData(data);
     } catch (err) {
@@ -80,10 +80,9 @@ export default function BandManager() {
   }
 
   async function handleDelete(band) {
-    if (!confirm(`Deseja remover a banda "${band.name}"?`)) return;
     setBusy(true);
     try {
-      const href = band._links?.self || `/bands/${band.id}`;
+      const href = band.links?.self;
       await requestByLink(href, { method: "DELETE" });
       if (selectedBandData?.band?.id === band.id) setSelectedBandData(null);
       await loadBands(searchQuery);

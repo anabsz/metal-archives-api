@@ -71,7 +71,7 @@ export default function NewsManager() {
     setIsModalDetailOpen(true);
     setBusy(true);
     try {
-      const href = news._links?.self || `/news/${news.id}`;
+      const href = news.links?.self;
       const data = await requestByLink(href);
       setSelectedNewsData(data || news);
     } catch (err) {
@@ -82,10 +82,9 @@ export default function NewsManager() {
   }
 
   async function handleDelete(news) {
-    if (!confirm(`Remover a notícia "${news.title}"?`)) return;
     setBusy(true);
     try {
-      const href = news._links?.self || `/news/${news.id}`;
+      const href = news.links?.self;
       await requestByLink(href, { method: "DELETE" });
       if (selectedNewsData?.id === news.id) setSelectedNewsData(null);
       await loadNews(searchQuery);
@@ -179,15 +178,6 @@ export default function NewsManager() {
               <p><small>Publicado em: {selectedNewsData.publishedAt}</small></p>
             )}
             <p style={{ marginTop: "1rem", whiteSpace: "pre-wrap" }}>{selectedNewsData.content}</p>
-
-            {selectedNewsData._links && (
-              <div style={{ marginTop: "1.5rem", padding: "0.75rem", backgroundColor: "#111", borderRadius: "4px" }}>
-                <small><strong>Links HATEOAS (`_links`):</strong></small>
-                <pre style={{ margin: "0.5rem 0 0 0", fontSize: "0.85rem", color: "#00d1b2" }}>
-                  {JSON.stringify(selectedNewsData._links, null, 2)}
-                </pre>
-              </div>
-            )}
           </div>
         ) : (
           <p>{busy ? "Carregando..." : "Nenhum detalhe disponível."}</p>

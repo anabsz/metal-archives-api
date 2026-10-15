@@ -16,9 +16,9 @@ export default function BandCard({ data }) {
           <dt>País</dt>
           <dd>{country}</dd>
 
-          {/* Filtra ID e _links para não exibir objetos HATEOAS brutos no <dl> */}
+          {/* Filtra ID e links para não exibir objetos HATEOAS brutos no <dl> */}
           {Object.entries(extra)
-            .filter(([k]) => k !== "id" && k !== "_links")
+            .filter(([k]) => k !== "id" && k !== "links")
             .map(([k, v]) => (
               <div key={k} className="pair">
                 <dt>{k}</dt>

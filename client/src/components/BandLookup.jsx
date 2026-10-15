@@ -37,7 +37,7 @@ export default function BandLookup() {
     setBusy(true);
     setError("");
     try {
-      const href = band._links?.self;
+      const href = band.links?.self;
       const data = await requestByLink(href);
       setSelectedBandData(data);
     } catch (err) {

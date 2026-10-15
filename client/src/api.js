@@ -70,31 +70,33 @@ async function request(pathOrUrl, options = {}, retry = true) {
 
 // Navegaçao generica
 export const requestByLink = (linkUrl, options = {}) => request(linkUrl, options);
-
 // Bandas
 export const getBands = (search = "") =>
-  request(`/bands${search ? `?search=${search}` : ""}`);
+  request(`/bands${search ? `?search=${encodeURIComponent(search)}` : ""}`);
 
 export const getBand = (id) => request(`/bands/${id}`);
 
 export const createBand = (data) =>
-  request("/bands", {method: "POST", body: JSON.stringify(data)});
+  request("/bands", { method: "POST", body: JSON.stringify(data) });
 
-export const updateBand = (data) =>
-  request("/bands", {method: "PUT", body: JSON.stringify(data)});
+export const updateBand = (id, data) =>
+  request(`/bands/${id}`, { method: "PUT", body: JSON.stringify(data) });
 
-export const deleteBand = (data) =>
-  request("/bands", {method: "DELETE", body: JSON.stringify(data)})
+export const deleteBand = (id) =>
+  request(`/bands/${id}`, { method: "DELETE" });
 
-// Noticias
+
+// Notícias
 export const listNews = (search = "") =>
-  request(`/news${search ? `?search=${search}` : ""}`);
+  request(`/news${search ? `?search=${encodeURIComponent(search)}` : ""}`);
 
-export const createNews = (newsData) =>
-  request("/news", { method: "POST", body: JSON.stringify(newsData) });
+export const getNews = (id) => request(`/news/${id}`);
 
-export const updateNews = (newsData) =>
-  request("/news", { method: "PUT", body: JSON.stringify(newsData) });
+export const createNews = (data) =>
+  request("/news", { method: "POST", body: JSON.stringify(data) });
 
-export const deleteNews = (newsId) =>
-  request(`/news/${newsId}`, { method: "DELETE" });
+export const updateNews = (id, data) =>
+  request(`/news/${id}`, { method: "PUT", body: JSON.stringify(data) });
+
+export const deleteNews = (id) =>
+  request(`/news/${id}`, { method: "DELETE" });
